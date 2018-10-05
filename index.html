@@ -31,7 +31,7 @@
             <form>
               <div class="form-group">
                 <label for="trainName">Train Name</label>
-                <input type="text" class="form-control" id="trainName" aria-describedby="emailHelp" placeholder="Name">
+                <input type="text" class="form-control" id="trainName" placeholder="Name">
               </div>
               <div class="form-group">
                 <label for="trainDest">Destination</label>
@@ -70,7 +70,7 @@
                 </tr>
               </thead>
               <tbody>
-                
+
               </tbody>
             </table>
           </div>
@@ -82,34 +82,76 @@
 
 
 
-   <!-- Delete Train Modal -->
-   <div class="modal fade" id="deleteTrainModal" tabindex="-1" role="dialog" aria-labelledby="deleteTrainModalTitle"
-   aria-hidden="true">
-   <div class="modal-dialog modal-dialog-centered" role="document">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h5 class="modal-title" id="deleteTrainModalTitle">Delete This Train?</h5>
-         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
-       </div>
-       <div class="modal-body">
-         Are you sure you want to delete this train?
-       </div>
-       <div class="modal-body">
-         <div class="row justify-content-between">
-           <div class="col">
-             <button type="button" class="btn btn-danger" id="deleteTrain">Yes, delete this</button>
-           </div>
-           <div class="col text-right">
-             <button type="button" class="btn btn-primary" id="doNotDeleteItem">No, keep this</button>
-           </div>
-         </div>
-       </div>
-     </div>
-   </div>
- </div>
- <!-- end delete train modal -->
+  <!-- Delete Train Modal -->
+  <div class="modal fade" id="deleteTrainModal" tabindex="-1" role="dialog" aria-labelledby="deleteTrainModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteTrainModalTitle">Delete This Train?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete this train?
+        </div>
+        <div class="modal-body">
+          <div class="row justify-content-between">
+            <div class="col">
+              <button type="button" class="btn btn-danger" id="deleteTrain">Yes, delete this</button>
+            </div>
+            <div class="col text-right">
+              <button type="button" class="btn btn-primary" id="doNotDeleteItem">No, keep this</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end delete train modal -->
+
+  <!-- Edit Train Modal -->
+  <div class="modal fade" id="editTrainModal" tabindex="-1" role="dialog" aria-labelledby="editTrainModalTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editTrainModalTitle">Edit Train Data</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <form>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="trainName">Train Name</label>
+              <input type="text" class="form-control" id="editTrainName" placeholder="Name">
+            </div>
+            <div class="form-group">
+              <label for="trainDest">Destination</label>
+              <input type="text" class="form-control" id="editTrainDest" placeholder="Destination">
+            </div>
+            <div class="form-group">
+              <label for="trainFirst">First Train Time</label>
+              <input type="time" class="form-control" id="editTrainFirst">
+            </div>
+            <div class="form-group">
+              <label for="trainFreq">Frequency (min)</label>
+              <input type="number" class="form-control" id="editTrainFreq" placeholder="#">
+            </div>
+            <div id="editValidation" class="text-danger"></div>
+
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary my-1" id="editTrainSubmit">Submit</button>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- End Edit Train Modal -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.13.0/umd/popper.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.2/js/bootstrap.min.js"></script>

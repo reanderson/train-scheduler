@@ -63,38 +63,33 @@ trainSubmitBtn.on("click", function (event) {
   trainFreqInput.val("");
 })
 
-//create firebase event for when a child is added
-database.ref().on("child_added", function (childSnapshot) {
-  console.log(childSnapshot.key)
-  console.log(childSnapshot.val());
-
-  // This is the key for the child's data in Firebase
-  const childKey = childSnapshot.key
-
-  // This is all the data we care about
-  const train = childSnapshot.val()
+function createRowContents(targetRow, snapshotValue, key) {
+  //takes a jquery html object <tr>,
+  //a snapshot.val() from firebase
+  //and a snapshot(key) from firebase
+  //appends appropriate row data to the targetRow
 
   // the name, destination, and frequency come straight out of the object
-  const name = train.name;
-  const destination = train.destination;
-  const frequency = train.frequency;
+  const name = snapshotValue.name;
+  const destination = snapshotValue.destination;
+  const frequency = snapshotValue.frequency;
 
   // to determine the next train time and the time until the next train, we need the starting time in Unix, the frequency in seconds, and the current time in unix
   let next;
   let timeuntil;
 
   const now = moment().format("X")
-  const start = moment(train.start, "HH:mm").format("X");
+  const start = moment(snapshotValue.start, "HH:mm").format("X");
   const freqSec = parseInt(frequency) * 60;
   console.log(`now: ${now}`);
   console.log(start);
   console.log(freqSec)
 
   // If it is currently before the starting time,
-  if(now < start) {
+  if (now < start) {
     // use only the start time to determine the next train and time until then
     next = moment(start, "X").format("hh:mm A")
-    timeuntil = moment(start,"X").toNow(true)
+    timeuntil = moment(start, "X").toNow(true)
   } else {
     // if we're after the starting time, then
     // add the frequency (in seconds) to the starting time
@@ -112,29 +107,59 @@ database.ref().on("child_added", function (childSnapshot) {
     timeuntil = moment(next, "X").toNow(true)
     next = moment(next, "X").format("hh:mm A")
   }
-  
-  const newRow = $("<tr>")
-    .append(
+
+  targetRow.append(
       $("<td>").text(name),
       $("<td>").text(destination),
       $("<td>").text(frequency),
       $("<td>").text(next),
       $("<td>").text(timeuntil),
-      $("<td>").html(`<i class="fas fa-pencil-alt editTrain" data-key=${childKey}></i>`),
-      $("<td>").html(`<i class="fas fa-trash deleteTrain" data-key=${childKey}></i>`),
+      $("<td>").html(`<i class="fas fa-pencil-alt editTrain" data-key=${key}></i>`),
+      $("<td>").html(`<i class="fas fa-trash deleteTrain" data-key=${key}></i>`),
     )
-    .attr("data-key", childKey);
+}
+
+//create firebase event for when a child is added
+database.ref().on("child_added", function (childSnapshot) {
+  console.log(childSnapshot.key)
+  console.log(childSnapshot.val());
+
+  // This is the key for the child's data in Firebase
+  const childKey = childSnapshot.key
+
+  // This is all the data we care about
+  const train = childSnapshot.val()
+
+  const newRow = $("<tr>")
+
+  createRowContents(newRow, train, childKey)
+
+  newRow.attr("data-key", childKey);
 
   // Append the new row to the table
   $("#trainTable > tbody").append(newRow);
 })
 
-//firebase event for item deleted
+//firebase event for child deleted
 database.ref().on("child_removed", function (childSnapshot) {
   const key = childSnapshot.key
 
   // Select the element in the table that has the data-key attribute with a value equal to the key of the removed item, and remove it from the page
   $(`[data-key=${key}]:first`).remove()
+})
+
+//firebase event for child updated
+database.ref().on("child_changed", function (childSnapshot) {
+  const key = childSnapshot.key
+
+  // select the row in the table that has the data-key attribute equal to the key
+  // we're using :first with this just to make sure it doesn't also grab the edit and delete buttons and accidentally cause unwanted issues.
+  const targetRow = $(`[data-key=${key}]:first`)
+
+  //empty out the row
+  targetRow.empty()
+
+  createRowContents(targetRow, childSnapshot.val(), key)
 })
 //=======================================================================================
 $(document).on("click", ".deleteTrain", function () {
@@ -154,4 +179,48 @@ $("#deleteTrain").on("click", function () {
   $("#deleteTrainModal").modal('hide')
 
   activeKey = false;
+})
+
+$(document).on("click", ".editTrain", function () {
+  activeKey = $(this).attr("data-key")
+
+  database.ref(activeKey).once('value').then(function (snapshot) {
+    const data = snapshot.val()
+    // set edit data modal's values to the current values of the data already in the database
+    $("#editTrainName").val(data.name);
+    $("#editTrainDest").val(data.destination);
+    $("#editTrainFirst").val(data.start);
+    $("#editTrainFreq").val(data.frequency);
+    $("#editTrainModal").modal('show')
+  })
+
+})
+
+$("#editTrainSubmit").on("click", function (event) {
+  event.preventDefault();
+
+  // grab user input
+  const trainName = $("#editTrainName").val().trim();
+  const trainDest = $("#editTrainDest").val().trim();
+  const trainFirst = $("#editTrainFirst").val().trim();
+  const trainFreq = $("#editTrainFreq").val().trim();
+
+
+  // input validation
+  if (!trainName || !trainDest || !trainFirst || !trainFreq) {
+    console.log("invalid input")
+    $("#editvalidation").text("Please fill all fields.")
+    return false;
+  }
+  $("#editvalidation").empty()
+
+  //update train in the database
+  database.ref(activeKey).update({
+    name: trainName,
+    destination: trainDest,
+    start: trainFirst,
+    frequency: trainFreq
+  })
+
+  $("#editTrainModal").modal('hide')
 })
